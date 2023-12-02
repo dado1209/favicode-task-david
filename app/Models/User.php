@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -42,4 +43,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+
+    // Get a user by username
+    public static function getUserByUsername($username)
+    {
+        return User::where('name', $username)->first();
+    }
+
+    // Get a user by email
+    public static function getUserByEmail($email)
+    {
+        return User::where('email', $email)->first();
+    }
+
 }
