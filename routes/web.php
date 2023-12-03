@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Middleware\isAuthenticated;
+use App\Http\Controllers\FileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,10 +16,16 @@ use App\Http\Middleware\isAuthenticated;
 */
 
 
-Route::middleware(['isAuthenticated'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/', function () {
-        return view('welcome');
+        return view('dashboard');
     });
+
+    Route::controller(FileController::class)->group(function(){
+        Route::get('/upload', 'showUploadForm')->name('showUpload');
+        Route::post('/upload', 'index')->name('upload');
+    });
+
 });
 
 
@@ -27,7 +33,7 @@ Route::middleware(['isAuthenticated'])->group(function () {
 Route::controller(AuthController::class)->group(function(){
     Route::get('/login', 'index')->name('login.get');
     Route::get('/logout', 'logout')->name('logout');
-    Route::post('/login', 'postLogin')->name('login.post');
+    Route::post('/login', 'authenticate')->name('login.post');
     Route::get('/register', 'register')->name('register');
     Route::post('/register', 'postRegister')->name('register.post');
 });

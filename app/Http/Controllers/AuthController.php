@@ -6,9 +6,9 @@ use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use function Laravel\Prompts\error;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -17,17 +17,14 @@ class AuthController extends Controller
         return view('login');
     }
 
-    public function postLogin(LoginRequest $req) {
-        $user = User::where('email', $req->email)->first();
-        // Check if user exists
-        if (!$user) {return redirect()->back()->withErrors(['email' => 'Invalid credentials']);}
-        // Check if password matches
-        if (!(Hash::check($req->input('password'), $user->password))) {
-            return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
+    public function authenticate(LoginRequest $req) {
+        // Check if user with request email exists and if it does compare passwords
+        if (Auth::attempt(['email' => $req->email,'password' => $req->password])) {
+            // Create a new session with the user id in it
+            $req->session()->regenerate();
+
+            return redirect('/');
         }
-        // Authenticate user
-        $req->session()->put('userId', $user->id);
-        return redirect('/');
     }
 
     public function register()

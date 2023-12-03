@@ -1,1 +1,4 @@
-hi
+@extends('layout')
+
+@section('content')
+@endsection
