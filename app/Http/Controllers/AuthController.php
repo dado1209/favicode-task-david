@@ -32,7 +32,7 @@ class AuthController extends Controller
         return view('register');
     }
 
-    public function postRegister(RegisterRequest $req) {
+    public function store(RegisterRequest $req) {
         // Create user in database
         $user = new User();
         $user->name = $req->name;

@@ -17,13 +17,11 @@ use App\Http\Controllers\FileController;
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', function () {
-        return view('dashboard');
-    });
-
     Route::controller(FileController::class)->group(function(){
+        Route::get('/', 'index')->name('index');
         Route::get('/upload', 'showUploadForm')->name('showUpload');
-        Route::post('/upload', 'index')->name('upload');
+        Route::post('/upload', 'upload')->name('upload');
+        Route::get('/download/{id}', 'download')->name('download');
     });
 
 });
@@ -35,6 +33,6 @@ Route::controller(AuthController::class)->group(function(){
     Route::get('/logout', 'logout')->name('logout');
     Route::post('/login', 'authenticate')->name('login.post');
     Route::get('/register', 'register')->name('register');
-    Route::post('/register', 'postRegister')->name('register.post');
+    Route::post('/register', 'store')->name('register.post');
 });
 
