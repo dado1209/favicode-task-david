@@ -7,8 +7,8 @@ use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use function Laravel\Prompts\error;
 use Illuminate\Support\Facades\Hash;
-use Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -42,6 +42,8 @@ class AuthController extends Controller
         $user->email = $req->email;
         $user->password = $req->password;
         $user->save();
+        // Create directory for new user
+        Storage::disk('local')->makeDirectory($user->id);;
         return redirect('login');
     }
 

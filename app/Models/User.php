@@ -58,5 +58,10 @@ class User extends Authenticatable
     {
         return User::where('email', $email)->first();
     }
+    // Get all files of user
+    public function files()
+    {
+        return $this->hasMany(File::class);
+    }
 
 }
