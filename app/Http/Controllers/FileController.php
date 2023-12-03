@@ -52,13 +52,16 @@ class FileController extends Controller
     public function download(Request $req){
         $userId = Auth::id();
         $file = File::find($req->id);
+        // Check if user has permission to download file
+        if($file->type == 'private' && $file->user_id != $userId) {
+            return response()->json(['error' => 'You do not have permission to download this file'], 403);
+        }
+
         $filePath = "{$userId}/{$file->storedName}";
-        if (Storage::exists($filePath)) {
-            // Download the file
-            return response()->download(Storage::path($filePath));
-        } else {
-            // File not found
+        if (!Storage::exists($filePath)) {
             return response()->json(['error' => 'File not found.'], 404);
         }
+        // Download the file
+        return response()->download(Storage::path($filePath));
     }
 }

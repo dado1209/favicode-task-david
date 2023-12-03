@@ -3,8 +3,6 @@
 @extends('layout') <!-- Assuming you have a layout file, adjust accordingly -->
 
 @section('content')
-    <h1>User Dashboard</h1>
-
     @if(count($files) > 0)
         <div style="text-align: center;">
             <table class="table" style="width: 80%;">
