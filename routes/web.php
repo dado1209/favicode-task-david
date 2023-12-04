@@ -21,7 +21,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/upload', 'showUploadForm')->name('showUpload');
         Route::post('/upload', 'upload')->name('upload');
-        Route::get('/download/{id}', 'download')->name('download');
+        Route::get('/download/{id}', 'download')->name('file.download');
+        Route::post('/settings/{id}', 'update')->name('file.settings');
+
     });
 
 });

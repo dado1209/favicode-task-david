@@ -5,6 +5,7 @@ use App\Models\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use App\Models\User;
 
 class FileService {
     public static function upload($userId, $file, $type) {
@@ -39,5 +40,20 @@ class FileService {
 
     public static function getFile($fileId) {
         return File::findOrFail($fileId);
+    }
+
+    public static function updateFile($fileId, $fileName, $fileType) {
+        $file = File::findOrFail($fileId);
+        $file->name = $fileName;
+        $file->type = $fileType;
+        $file->save();
+    }
+
+    public static function getUserFiles($userId) {
+        //TODO: get all file names of userId folder and get all files from files tables using the file names
+        //it is possible that the userFiles folder will be deleted
+
+        // Load all the users files
+        return User::find($userId)->files;
     }
 }
