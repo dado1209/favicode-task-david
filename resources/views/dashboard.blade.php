@@ -7,9 +7,9 @@
         </div>
     @endif
     @if (session('Update'))
-    <div class="alert alert-success text-center" style="width: 80%; margin: 0 auto;">
-        {{ session('Update') }}
-    </div>
+        <div class="alert alert-success text-center" style="width: 80%; margin: 0 auto;">
+            {{ session('Update') }}
+        </div>
     @endif
 
     @if (count($files) > 0)
@@ -38,14 +38,25 @@
                                     <button class="btn btn-warning" onclick="toggleOptions('{{ $file->id }}')">
                                         <i class="fas fa-cogs"></i> Settings
                                     </button>
+
+                                    <form id="deleteForm_{{ $file->id }}"
+                                        action="{{ route('file.delete', ['id' => $file->id]) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="button" class="btn btn-danger"
+                                            onclick="showDeleteConfirmation('{{ $file->id }}')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
                                 </div>
                                 <div class="options-container hidden" id="options-container-{{ $file->id }}">
-                                    <form action="{{ route('file.settings', ['id' => $file->id]) }}" method="post">
+                                    <form action="{{ route('file.update', ['id' => $file->id]) }}" method="post">
                                         @csrf
                                         <div class="form-group">
                                             <label for="newFileName">File Name</label>
-                                            <input type="text" class="form-control" id="newFileName"
-                                                name="newFileName" value="{{ $file->name }}">
+                                            <input type="text" class="form-control" id="newFileName" name="newFileName"
+                                                value="{{ $file->name }}">
                                         </div>
                                         <div class="form-group">
                                             <label for="newFileType">File Type</label>
@@ -70,6 +81,15 @@
             function toggleOptions(fileId) {
                 const optionsContainer = document.querySelector('#options-container-' + fileId);
                 optionsContainer.classList.toggle('show-options');
+            }
+
+            function showDeleteConfirmation(fileId) {
+                const confirmDelete = confirm("Are you sure you want to delete this file?");
+
+                if (confirmDelete) {
+                    const deleteForm = document.getElementById('deleteForm_' + fileId);
+                    deleteForm.submit();
+                }
             }
         </script>
 

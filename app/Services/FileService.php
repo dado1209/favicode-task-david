@@ -1,14 +1,17 @@
 <?php
 
 namespace App\Services;
+
 use App\Models\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use App\Models\User;
 
-class FileService {
-    public static function upload($userId, $file, $type) {
+class FileService
+{
+    public static function upload($userId, $file, $type)
+    {
         // TODO: check if user has enough storage
         // Get filename once it is stored on server
         $storedName = basename($file->store($userId));
@@ -20,12 +23,12 @@ class FileService {
         $newFile->type = $type;
         $newFile->storedName = $storedName;
         $newFile->save();
-
     }
 
-    public static function download($userId, $file){
+    public static function getFileFromDirectory($userId, $file)
+    {
         // Check if user has permission to download file
-        if($file->type == 'private' && $file->user_id != $userId) {
+        if ($file->type == 'private' && $file->user_id != $userId) {
             throw new AuthenticationException('You do not have permission to download this file');
         }
 
@@ -35,21 +38,37 @@ class FileService {
         }
         // Return the file
         return Storage::path($filePath);
-
     }
 
-    public static function getFile($fileId) {
+    public static function getFile($fileId)
+    {
         return File::findOrFail($fileId);
     }
 
-    public static function updateFile($fileId, $fileName, $fileType) {
+    public static function updateFile($fileId, $fileName, $fileType)
+    {
         $file = File::findOrFail($fileId);
         $file->name = $fileName;
         $file->type = $fileType;
         $file->save();
     }
+    public static function deleteFile($userId, $fileId)
+    {
 
-    public static function getUserFiles($userId) {
+
+        $file = File::findOrFail($fileId);
+        if ($file->user_id != $userId) {
+            throw new AuthenticationException('You do not have permission to delete this file');
+        }
+        // First delete the file from the directory
+        Storage::delete(self::getFileFromDirectory($userId, $file));
+        // Delete the file from the files tables
+        $file->delete();
+
+    }
+
+    public static function getUserFiles($userId)
+    {
         //TODO: get all file names of userId folder and get all files from files tables using the file names
         //it is possible that the userFiles folder will be deleted
 

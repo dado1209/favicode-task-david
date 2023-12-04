@@ -22,7 +22,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/upload', 'showUploadForm')->name('showUpload');
         Route::post('/upload', 'upload')->name('upload');
         Route::get('/download/{id}', 'download')->name('file.download');
-        Route::post('/settings/{id}', 'update')->name('file.settings');
+        Route::post('/files/{id}', 'update')->name('file.update');
+        Route::delete('/files/{id}', 'delete')->name('file.delete');
 
     });
 

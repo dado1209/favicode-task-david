@@ -20,6 +20,7 @@ class FileController extends Controller
         try {
             return view('dashboard')->with('files', FileService::getUserFiles(Auth::id()));
         } catch (\Exception $e) {
+            Log::error('Exception: ' . $e->getMessage());
             return view('errors.error')->with(['message' => 'Something went wrong']);
         }
     }
@@ -51,7 +52,7 @@ class FileController extends Controller
             $userId = Auth::id();
             // Find file in files table
             $file = FileService::getFile($req->id);
-            return response()->download(FileService::download($userId, $file));
+            return response()->download(FileService::getFileFromDirectory($userId, $file));
         } catch (AuthenticationException $e) {
             Log::error('AuthenticationException: ' . $e->getMessage());
             session()->flash('Error', 'You do not have permission to download this file');
@@ -80,7 +81,19 @@ class FileController extends Controller
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             session()->flash('Error', 'Something went wrong');
+            return redirect()->route('index');
+        }
+    }
+
+    public function delete(Request $req)
+    {
+        try {
+            FileService::deleteFile(Auth::id(), $req->id);
+            session()->flash('Update', 'File has been deleted');
             return redirect()->back();
+        } catch (\Exception $e) {
+            Log::error('Exception: ' . $e->getMessage());
+            return view('errors.error')->with(['message' => 'Something went wrong']);
         }
     }
 }
