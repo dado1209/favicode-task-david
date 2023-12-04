@@ -4,49 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
-use App\Models\User;
 use function Laravel\Prompts\error;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
+use App\Services\AuthService;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
     public function index()
     {
-        return view('login');
+        return view('auth.login');
     }
 
-    public function authenticate(LoginRequest $req) {
-        // Check if user with request email exists and if it does compare passwords
-        if (Auth::attempt(['email' => $req->email,'password' => $req->password])) {
-            // Create a new session with the user id in it
+    public function authenticate(LoginRequest $req)
+    {
+        // LoginRequest handles checking if user exists
+        try {
+            AuthService::authenticate($req);
             $req->session()->regenerate();
-
             return redirect('/');
+        } catch (\Illuminate\Auth\AuthenticationException $e) {
+            Log::error('Authentication Exception : ' . $e->getMessage());
+            return redirect()->back()->withErrors(['message' => 'Invalid credentials']);
+        } catch (\Exception $e) {
+            Log::error('Exception : ' . $e->getMessage());
+            return redirect()->back()->withErrors(['message' => 'Something went wrong']);
         }
     }
 
     public function register()
     {
-        return view('register');
+        return view('auth.register');
     }
 
-    public function store(RegisterRequest $req) {
-        // Create user in database
-        $user = new User();
-        $user->name = $req->name;
-        $user->email = $req->email;
-        $user->password = $req->password;
-        $user->save();
-        // Create directory for new user
-        Storage::disk('local')->makeDirectory($user->id);;
-        return redirect('login');
+    public function store(RegisterRequest $req)
+    {
+        try {
+            AuthService::store($req);
+            return redirect('login');
+        } catch (\Exception $e) {
+            Log::error('Exception : ' . $e->getMessage());
+            return redirect()->back()->withErrors(['message' => 'Something went wrong']);
+        }
     }
 
-    public function logout(Request $req) {
-        // delete session
-        $req->session()->invalidate();
-        return redirect('login');
+    public function logout(Request $req)
+    {
+        try{
+            // delete session
+            $req->session()->invalidate();
+            return redirect('login');
+        }
+        catch(\Exception $e) {
+            Log::error('Exception : ' . $e->getMessage());
+            return view('errors.error')->with(['message' => 'Something went wrong']);
+        }
     }
 }

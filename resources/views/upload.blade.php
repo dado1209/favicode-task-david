@@ -7,14 +7,8 @@
                 <div style="color: green;">{{ session('success') }}</div>
             @endif
 
-            @if ($errors->any())
-                <div style="color: red;">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+            @if (session('errors'))
+            <span class="text-danger">{{ session('errors')->first() }}</span>
             @endif
 
             <form action="{{ route('upload') }}" method="post" enctype="multipart/form-data" id="uploadForm">

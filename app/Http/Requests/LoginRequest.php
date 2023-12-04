@@ -30,7 +30,7 @@ class LoginRequest extends FormRequest
     public function messages()
     {
         return [
-            'username.exists' => 'Invalid credentials',
+            'email.exists' => 'Invalid credentials',
         ];
     }
 

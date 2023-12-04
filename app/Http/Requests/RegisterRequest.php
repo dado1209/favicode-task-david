@@ -31,7 +31,7 @@ class RegisterRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.unique' => 'Invalid credentials',
+            'name.unique' => 'This name is unavaliable',
             'email.unique' => 'Invalid credentials',
         ];
     }
