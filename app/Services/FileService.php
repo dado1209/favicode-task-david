@@ -8,12 +8,20 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use App\Models\User;
 use App\Interfaces\FileInterface;
+use App\Exceptions\StorageLimitExceededException;
 
 class FileService implements FileInterface
 {
     public static function upload($userId, $file, $type)
     {
-        // TODO: check if user has enough storage
+        // Check if user has enough storage
+        $user = User::find($userId);
+        $usedUsedStorage = $user->files->pluck('size')->sum();
+        $maxUserStorage = $user->allowedStorageGB *1000000000;//convert gigabytes to bytes
+        if($file->getSize()+$usedUsedStorage > $maxUserStorage) {
+            throw new StorageLimitExceededException('You do not have enough storage to upload this file');
+        }
+
         // Get filename once it is stored on server
         $storedName = basename($file->store($userId));
         // Create entry in database
@@ -33,7 +41,7 @@ class FileService implements FileInterface
             throw new AuthenticationException('You do not have permission to download this file');
         }
 
-        $filePath = "{$userId}/{$file->storedName}";
+        $filePath = "{$file->user_id}/{$file->storedName}";
         if (!Storage::exists($filePath)) {
             throw new FileNotFoundException;
         }

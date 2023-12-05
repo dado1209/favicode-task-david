@@ -12,13 +12,14 @@ use App\Services\FileService;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Exceptions\StorageLimitExceededException;
 
 class FileController extends Controller
 {
     public function index()
     {
         try {
-            return view('dashboard')->with('files', FileService::getUserFiles(Auth::id()));
+            return view('dashboard')->with(['files' => FileService::getUserFiles(Auth::id()), 'user' => Auth::user()]);
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             return view('errors.error')->with(['message' => 'Something went wrong']);
@@ -33,6 +34,10 @@ class FileController extends Controller
             // Upload the file to userId folder
             FileService::upload($userId, $file, $type);
             return redirect()->route('index')->with('success', 'File uploaded successfully!');
+        } catch (StorageLimitExceededException $e) {
+            Log::error('Exception: ' . $e->getMessage());
+            // Return a user-friendly error message
+            return redirect()->route('showUpload')->withErrors(['message' => $e->getMessage()]);
         } catch (\Exception $e) {
             // Log the exception for debugging purposes
             Log::error('Exception: ' . $e->getMessage());
@@ -43,7 +48,12 @@ class FileController extends Controller
 
     public function showUploadForm()
     {
-        return view('upload');
+        try {
+            return view('upload')->with(['files' => FileService::getUserFiles(Auth::id()), 'user' => Auth::user()]);
+        } catch (\Exception $e) {
+            Log::error('Exception: ' . $e->getMessage());
+            return view('errors.error')->with(['message' => 'Something went wrong']);
+        }
     }
 
     public function download(Request $req)
@@ -56,7 +66,7 @@ class FileController extends Controller
         } catch (AuthenticationException $e) {
             Log::error('AuthenticationException: ' . $e->getMessage());
             session()->flash('Error', 'You do not have permission to download this file');
-            return redirect()->back();
+            return redirect()->route('index');
         } catch (ModelNotFoundException $e) {
             Log::error('ModelNotFoundException: ' . $e->getMessage());
             session()->flash('Error', 'File not found');

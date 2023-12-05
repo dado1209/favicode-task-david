@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->float('allowedStorageGB')->default(15.0);
+            $table->float('allowedStorageGB')->default(0.1);
             $table->timestamps();
         });
     }

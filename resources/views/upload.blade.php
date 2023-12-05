@@ -8,12 +8,13 @@
             @endif
 
             @if (session('errors'))
-            <span class="text-danger">{{ session('errors')->first() }}</span>
+                <span class="text-danger">{{ session('errors')->first() }}</span>
             @endif
 
             <form action="{{ route('upload') }}" method="post" enctype="multipart/form-data" id="uploadForm">
                 @csrf
-                <div id="drop-area" class="col-md-8 offset-md-2" style="border: 2px dashed #ccc; border-radius: 8px; padding: 40px; text-align: center; transition: border 0.3s ease;">
+                <div id="drop-area" class="col-md-8 offset-md-2"
+                    style="border: 2px dashed #ccc; border-radius: 8px; padding: 40px; text-align: center; transition: border 0.3s ease;">
                     <label for="file" id="file-label" style="cursor: pointer;">Choose File or Drag and Drop</label>
                     <input type="file" name="file" id="file" class="file-input" required style="display: none;">
                     <div id="file-name" style="margin-top: 20px; font-weight: bold;"></div>
@@ -25,7 +26,7 @@
                 </select>
 
                 <div class="col-md-8 offset-md-2" style="margin-top: 20px;">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" onclick="uploadFile()">
                         Upload
                     </button>
                 </div>
@@ -82,6 +83,18 @@
                     } else {
                         fileNameDisplay.textContent = '';
                     }
+                }
+
+                function uploadFile() {
+                    // Get the file size before uploading
+                    const fileSize = fileInput.files[0].size;
+                    console.log('File Size:', fileSize);
+
+                    // You can add additional logic here before submitting the form
+                    // For example, check the file size against a limit
+
+                    // Now submit the form
+                    document.getElementById('uploadForm').submit();
                 }
             </script>
 

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('storedName');
-            $table->float('size');
+            $table->double('size');
             $table->enum('type', ['public', 'private'])->default('private');
             $table->timestamps();
         });
