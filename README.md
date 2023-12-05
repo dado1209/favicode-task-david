@@ -9,7 +9,7 @@ Basic cloud storage using laravel
 - Copy the .env.example file to a new file named .env:
 - Run `composer install` to install the dependencies.
 - Run `php artisan key:generate` to generate a unique application key
-- Run `php artisan migrate` to set up database tables
+- Add database information in .env and run `php artisan migrate` to set database tables
 
 ## Usage
 
