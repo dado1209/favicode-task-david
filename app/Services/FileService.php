@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use App\Models\User;
+use App\Interfaces\FileInterface;
 
-class FileService
+class FileService implements FileInterface
 {
     public static function upload($userId, $file, $type)
     {

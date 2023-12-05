@@ -26,9 +26,9 @@ class AuthController extends Controller
         } catch (\Illuminate\Auth\AuthenticationException $e) {
             Log::error('Authentication Exception : ' . $e->getMessage());
             return redirect()->back()->withErrors(['message' => 'Invalid credentials']);
-        } catch (\Exception $e) {
+        } catch(\Exception $e) {
             Log::error('Exception : ' . $e->getMessage());
-            return redirect()->back()->withErrors(['message' => 'Something went wrong']);
+            return view('errors.error')->with(['message' => 'Something went wrong']);
         }
     }
 

@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\AuthenticationException;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use App\Interfaces\AuthInterface;
 
-class AuthService {
+class AuthService implements AuthInterface {
     // Check if user password matches
     public static function authenticate(LoginRequest $req) {
         if (!Auth::attempt(['email' => $req->email,'password' => $req->password])) {
