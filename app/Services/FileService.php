@@ -32,7 +32,6 @@ class FileService implements FileInterface
         $newFile->type = $type;
         $newFile->storedName = $storedName;
         $newFile->save();
-        //TODO: add client side check for file size
     }
 
     public static function getFileFromDirectory($userId, $file)
