@@ -18,6 +18,7 @@
                     <label for="file" id="file-label" style="cursor: pointer;">Choose File or Drag and Drop</label>
                     <input type="file" name="file" id="file" class="file-input" required style="display: none;">
                     <div id="file-name" style="margin-top: 20px; font-weight: bold;"></div>
+                    <div id="file-size-warning" style="margin-top: 10px; color: red;"></div>
                 </div>
 
                 <select name="type" id="type" required style="margin-top: 20px;">
@@ -36,6 +37,7 @@
                 const dropArea = document.getElementById('drop-area');
                 const fileInput = document.getElementById('file');
                 const fileNameDisplay = document.getElementById('file-name');
+                const fileSizeWarning = document.getElementById('file-size-warning');
 
                 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                     dropArea.addEventListener(eventName, preventDefaults, false);
@@ -88,10 +90,16 @@
                 function uploadFile() {
                     // Get the file size before uploading
                     const fileSize = fileInput.files[0].size;
-                    console.log('File Size:', fileSize);
 
-                    // You can add additional logic here before submitting the form
-                    // For example, check the file size against a limit
+                    // Check if the file size exceeds the allowed limit (40 MB in bytes)
+                    const allowedSize = 40 * 1024 * 1024; // 40 MB
+                    if (fileSize > allowedSize) {
+                        fileSizeWarning.textContent = 'File size exceeds the allowed limit.';
+                        return;
+                    }
+
+                    // Clear any previous warning
+                    fileSizeWarning.textContent = '';
 
                     // Now submit the form
                     document.getElementById('uploadForm').submit();

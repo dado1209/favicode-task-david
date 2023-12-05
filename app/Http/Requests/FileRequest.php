@@ -22,7 +22,14 @@ class FileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required',
+            'file' => 'required|max:200000',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'file.max' => 'The file exceeds the maximum allowed size.',
         ];
     }
 }

@@ -32,6 +32,7 @@ class FileService implements FileInterface
         $newFile->type = $type;
         $newFile->storedName = $storedName;
         $newFile->save();
+        //TODO: add client side check for file size
     }
 
     public static function getFileFromDirectory($userId, $file)
@@ -78,9 +79,7 @@ class FileService implements FileInterface
 
     public static function getUserFiles($userId)
     {
-        //TODO: get all file names of userId folder and get all files from files tables using the file names
-        //it is possible that the userFiles folder will be deleted
-
+        //TODO: add better syncronization between files in directory and file logs in files table.
         // Load all the users files
         return User::find($userId)->files;
     }

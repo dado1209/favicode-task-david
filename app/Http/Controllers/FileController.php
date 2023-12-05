@@ -70,15 +70,15 @@ class FileController extends Controller
         } catch (ModelNotFoundException $e) {
             Log::error('ModelNotFoundException: ' . $e->getMessage());
             session()->flash('Error', 'File not found');
-            return redirect()->back();
+            return redirect()->route('index');
         } catch (FileNotFoundException $e) {
             Log::error('FileNotFoundException: ' . $e->getMessage());
             session()->flash('Error', 'File not found');
-            return redirect()->back();
+            return redirect()->route('index');
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             session()->flash('Error', 'Something went wrong');
-            return redirect()->back();
+            return redirect()->route('index');
         }
     }
 
