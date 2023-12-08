@@ -5,6 +5,6 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 interface AuthInterface
 {
-    public static function authenticate(LoginRequest $req);
-    public static function store(RegisterRequest $req);
+    public function authenticate(LoginRequest $req);
+    public function store(RegisterRequest $req);
 }

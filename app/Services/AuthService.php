@@ -11,13 +11,13 @@ use App\Interfaces\AuthInterface;
 
 class AuthService implements AuthInterface {
     // Check if user password matches
-    public static function authenticate(LoginRequest $req) {
+    public function authenticate(LoginRequest $req) {
         if (!Auth::attempt(['email' => $req->email,'password' => $req->password])) {
             throw new AuthenticationException('Invalid credentials');
         }
     }
 
-    public static function store(RegisterRequest $req) {
+    public function store(RegisterRequest $req) {
         // Create user in database
         $user = new User();
         $user->name = $req->name;

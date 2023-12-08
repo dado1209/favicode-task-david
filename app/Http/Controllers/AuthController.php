@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
-use function Laravel\Prompts\error;
+use App\Interfaces\AuthInterface;
 use Illuminate\Http\Request;
-use App\Services\AuthService;
 use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
@@ -16,11 +15,11 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function authenticate(LoginRequest $req)
+    public function authenticate(LoginRequest $req, AuthInterface $userService)
     {
         // LoginRequest handles checking if user exists
         try {
-            AuthService::authenticate($req);
+            $userService->authenticate($req);
             $req->session()->regenerate();
             return redirect('/');
         } catch (\Illuminate\Auth\AuthenticationException $e) {
@@ -37,10 +36,10 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function store(RegisterRequest $req)
+    public function store(RegisterRequest $req, AuthInterface $userService)
     {
         try {
-            AuthService::store($req);
+            $userService->store($req);
             return redirect('login');
         } catch (\Exception $e) {
             Log::error('Exception : ' . $e->getMessage());
@@ -48,7 +47,7 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(Request $req)
+    public function logout(Request $req, AuthInterface $service)
     {
         try{
             // delete session

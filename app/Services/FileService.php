@@ -12,7 +12,7 @@ use App\Exceptions\StorageLimitExceededException;
 
 class FileService implements FileInterface
 {
-    public static function upload($userId, $file, $type)
+    public function upload($userId, $file, $type)
     {
         // Check if user has enough storage
         $user = User::find($userId);
@@ -34,7 +34,7 @@ class FileService implements FileInterface
         $newFile->save();
     }
 
-    public static function getFileFromDirectory($userId, $file)
+    public function getFileFromDirectory($userId, $file)
     {
         // Check if user has permission to download file
         if ($file->type == 'private' && $file->user_id != $userId) {
@@ -49,19 +49,19 @@ class FileService implements FileInterface
         return Storage::path($filePath);
     }
 
-    public static function getFile($fileId)
+    public function getFile($fileId)
     {
         return File::findOrFail($fileId);
     }
 
-    public static function updateFile($fileId, $fileName, $fileType)
+    public function updateFile($fileId, $fileName, $fileType)
     {
         $file = File::findOrFail($fileId);
         $file->name = $fileName;
         $file->type = $fileType;
         $file->save();
     }
-    public static function deleteFile($userId, $fileId)
+    public function deleteFile($userId, $fileId)
     {
 
 
@@ -76,7 +76,7 @@ class FileService implements FileInterface
 
     }
 
-    public static function getUserFiles($userId)
+    public function getUserFiles($userId)
     {
         //TODO: add better syncronization between files in directory and file logs in files table.
         // Load all the users files

@@ -27,4 +27,17 @@ class Handler extends ExceptionHandler
             //
         });
     }
+/*
+    public function render($request, Throwable $e)
+    {
+        if ($e instanceof \Illuminate\Database\QueryException) {
+            return view('errors.error')->with(['message' => 'Something went wrong']);
+        } elseif ($e instanceof \PDOException) {
+            return view('errors.error')->with(['message' => 'Something went wrong']);
+        }
+
+        else{
+            return view('errors.error')->with(['message' => $e->getMessage()]);
+        }
+    } */
 }

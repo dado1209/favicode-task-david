@@ -6,33 +6,31 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\FileRequest;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
-use App\Services\AuthService;
-use App\Services\FileService;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Exceptions\StorageLimitExceededException;
+use App\Interfaces\FileInterface;
 
 class FileController extends Controller
 {
-    public function index()
+    public function index(FileInterface $service)
     {
         try {
-            return view('dashboard')->with(['files' => FileService::getUserFiles(Auth::id()), 'user' => Auth::user()]);
+            return view('dashboard')->with(['files' => $service->getUserFiles(Auth::id()), 'user' => Auth::user()]);
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             return view('errors.error')->with(['message' => 'Something went wrong']);
         }
     }
-    public function upload(FileRequest $req)
+    public function upload(FileRequest $req, FileInterface $Fileservice)
     {
         try {
             $userId = Auth::id();
             $file = $req->file('file');
             $type = $req->input('type');
             // Upload the file to userId folder
-            FileService::upload($userId, $file, $type);
+            $Fileservice->upload($userId, $file, $type);
             return redirect()->route('index')->with('success', 'File uploaded successfully!');
         } catch (StorageLimitExceededException $e) {
             Log::error('Exception: ' . $e->getMessage());
@@ -46,23 +44,23 @@ class FileController extends Controller
         }
     }
 
-    public function showUploadForm()
+    public function showUploadForm(FileInterface $Fileservice)
     {
         try {
-            return view('upload')->with(['files' => FileService::getUserFiles(Auth::id()), 'user' => Auth::user()]);
+            return view('upload')->with(['files' => $Fileservice->getUserFiles(Auth::id()), 'user' => Auth::user()]);
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             return view('errors.error')->with(['message' => 'Something went wrong']);
         }
     }
 
-    public function download(Request $req)
+    public function download(Request $req, FileInterface $Fileservice)
     {
         try {
             $userId = Auth::id();
             // Find file in files table
-            $file = FileService::getFile($req->id);
-            return response()->download(FileService::getFileFromDirectory($userId, $file));
+            $file = $Fileservice->getFile($req->id);
+            return response()->download($Fileservice->getFileFromDirectory($userId, $file));
         } catch (AuthenticationException $e) {
             Log::error('AuthenticationException: ' . $e->getMessage());
             session()->flash('Error', 'You do not have permission to download this file');
@@ -82,10 +80,10 @@ class FileController extends Controller
         }
     }
 
-    public function update(Request $req)
+    public function update(Request $req, FileInterface $Fileservice)
     {
         try {
-            FileService::updateFile($req->id, $req->input('newFileName'), $req->input('newFileType'));
+            $Fileservice->updateFile($req->id, $req->input('newFileName'), $req->input('newFileType'));
             session()->flash('Update', 'File has been updated');
             return redirect()->back();
         } catch (\Exception $e) {
@@ -95,10 +93,10 @@ class FileController extends Controller
         }
     }
 
-    public function delete(Request $req)
+    public function delete(Request $req, FileInterface $Fileservice)
     {
         try {
-            FileService::deleteFile(Auth::id(), $req->id);
+            $Fileservice->deleteFile(Auth::id(), $req->id);
             session()->flash('Update', 'File has been deleted');
             return redirect()->back();
         } catch (\Exception $e) {
