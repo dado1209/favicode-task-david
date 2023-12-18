@@ -24,7 +24,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/download/{id}', 'download')->name('file.download');
         Route::post('/files/{id}', 'update')->name('file.update');
         Route::delete('/files/{id}', 'delete')->name('file.delete');
-
+        Route::get('/files/{id}', 'show')->name('file.show');
     });
 
 });

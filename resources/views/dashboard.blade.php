@@ -1,5 +1,4 @@
 @extends('layout')
-
 @section('content')
     @if (session('Error'))
         <div class="alert alert-danger text-center" style="width: 80%; margin: 0 auto;">
@@ -25,67 +24,22 @@
                 </thead>
                 <tbody>
                     @foreach ($files as $file)
+                        @include('file.display-file-modal')
                         <tr style="background-color: #f2f2f2;">
-                            <td>{{ $file->name }}</td>
+                            <td style="white-space: nowrap;"
+                                onclick="openPopup('{{ $file->id }}', '{{ $file->name }}')">{{ $file->name }}</td>
                             <td>{{ $file->size / 1000 }} KB</td>
                             <td>{{ $file->type }}</td>
                             <td>
-                                <div class="btn-group">
-                                    <a href="{{ route('file.download', ['id' => $file->id]) }}" class="btn btn-primary">
-                                        <i class="fas fa-download"></i> Download
-                                    </a>
-
-                                    @if ($file->type === 'public')
-                                        <button class="btn btn-success"
-                                            onclick="shareFile('{{ route('file.download', ['id' => $file->id]) }}')">
-                                            <i class="fas fa-share"></i> Share
-                                        </button>
-                                    @endif
-
-                                    <button class="btn btn-warning" onclick="toggleOptions('{{ $file->id }}')">
-                                        <i class="fas fa-cogs"></i> Settings
-                                    </button>
-
-                                    <form id="deleteForm_{{ $file->id }}"
-                                        action="{{ route('file.delete', ['id' => $file->id]) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button type="button" class="btn btn-danger"
-                                            onclick="showDeleteConfirmation('{{ $file->id }}')">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                    </form>
-                                </div>
-                                <div class="options-container hidden" id="options-container-{{ $file->id }}">
-                                    <form action="{{ route('file.update', ['id' => $file->id]) }}" method="post">
-                                        @csrf
-                                        <div class="form-group">
-                                            <label for="newFileName">File Name</label>
-                                            <input type="text" class="form-control" id="newFileName" name="newFileName"
-                                                value="{{ $file->name }}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="newFileType">File Type</label>
-                                            <select class="form-control" id="newFileType" name="newFileType">
-                                                <option value="public">Public</option>
-                                                <option value="private">Private</option>
-                                            </select>
-                                        </div>
-                                        <button type="submit" class="btn btn-success">Save</button>
-                                        <button type="button" class="btn btn-secondary"
-                                            onclick="toggleOptions('{{ $file->id }}')">Cancel</button>
-                                    </form>
-                                </div>
+                                @include('file.file-buttons')
+                                @include('file.settings-form')
                             </td>
                         </tr>
                     @endforeach
-
-                    <!-- ... (remaining content) ... -->
-
                 </tbody>
             </table>
         </div>
+
 
         <script>
             function toggleOptions(fileId) {
@@ -111,6 +65,33 @@
                 document.body.removeChild(tempInput);
                 alert('Link copied to clipboard!');
             }
+
+            function openPopup(fileId, fileName) {
+                // Set the modal ID
+                var modalId = '#popupModal_' + fileId;
+
+                // Check if the modal exists
+                if ($(modalId).length) {
+                    // Extract the file extension from the file name
+                    var fileExtension = fileName.split('.').pop().toLowerCase();
+
+                    // Define an array of allowed image file extensions
+                    var allowedExtensions = ['png', 'jpg', 'txt'];
+
+                    // Check if the file extension is allowed
+                    if (allowedExtensions.includes(fileExtension)) {
+                        // Set the modal title
+                        $(modalId + 'Label').text(fileName);
+
+                        // Display the Bootstrap modal
+                        $(modalId).modal('show');
+                    } else {
+                        console.error('File type not supported for preview: ' + fileExtension);
+                    }
+                } else {
+                    console.error('Modal not found with ID: ' + modalId);
+                }
+            }
         </script>
 
         <style>
@@ -125,21 +106,6 @@
     @else
         <p>No files found.</p>
     @endif
-
-    @if (count($files) > 0)
-        @php
-            $totalSize = $files->pluck('size')->sum() / 1000000000; // add all the sizes of files and convert bytes to gigabytes;
-            $storageUsageRatio = $totalSize / $user->allowedStorageGB;
-        @endphp
-
-        <div class="storage-usage-bar" style="position: fixed; bottom: 10px; right: 10px;">
-            Storage Capacity
-            <div class="progress" style="width: 150px;">
-                <div class="progress-bar bg-info" role="progressbar" style="width: {{ $storageUsageRatio }}%;"
-                    aria-valuenow="{{ $storageUsageRatio }}" aria-valuemin="0" aria-valuemax="100">
-                    {{ number_format($storageUsageRatio, 2) }}%
-                </div>
-            </div>
-        </div>
-    @endif
+    @include('file.display-storage')
+    @include('file.display-file-modal')
 @endsection

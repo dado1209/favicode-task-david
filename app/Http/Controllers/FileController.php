@@ -47,7 +47,7 @@ class FileController extends Controller
     public function showUploadForm(FileInterface $Fileservice)
     {
         try {
-            return view('upload')->with(['files' => $Fileservice->getUserFiles(Auth::id()), 'user' => Auth::user()]);
+            return view('file.upload')->with(['files' => $Fileservice->getUserFiles(Auth::id()), 'user' => Auth::user()]);
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             return view('errors.error')->with(['message' => 'Something went wrong']);
@@ -100,6 +100,18 @@ class FileController extends Controller
             session()->flash('Update', 'File has been deleted');
             return redirect()->back();
         } catch (\Exception $e) {
+            Log::error('Exception: ' . $e->getMessage());
+            return view('errors.error')->with(['message' => 'Something went wrong']);
+        }
+    }
+
+    public function show(Request $req, FileInterface $Fileservice) {
+        try{
+            $file = $Fileservice->getFile($req->id);
+            $filePath = $Fileservice->getFileFromDirectory(Auth::id(), $file);
+            return response()->file($filePath);
+        }
+        catch(\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             return view('errors.error')->with(['message' => 'Something went wrong']);
         }
